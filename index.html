@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>We Are Ascension — Websites that make your brand rise</title>
+  <meta name="description" content="We Are Ascension designs cinematic, fast websites for ambitious businesses worldwide. Rise to the top floor and tell the team about your project.">
+  <meta name="theme-color" content="#f4efe7">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="We Are Ascension — Websites that make your brand rise">
+  <meta property="og:description" content="Cinematic, fast websites for ambitious businesses worldwide. Start your project.">
+  <script>
+    // Before the first paint: "js" turns the hero into the start of a tall climb (rise.js). It fails open: if rise.js
+    // never runs, the load handler drops it, and the page is a one-screen hero with the form right below.
+    (function () {
+      var d = document.documentElement;
+      d.classList.add('js');
+      window.addEventListener('load', function () { if (!window.__riseReady) d.classList.remove('js'); });
+    }());
+  </script>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script src="assets/js/rise.js" defer></script>
+  <script src="assets/js/form.js" defer></script>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="mark" viewBox="0 0 40 40">
+      <polygon points="20,4 36,15 30,34 10,34 4,15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <polygon points="20,14 27,25 13,25" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" opacity=".7"/>
+    </symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24">
+      <path d="M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M9.1 8.2c.2.5.6 1.4.7 1.6.1.2.1.4 0 .6l-.5.7c-.1.2-.3.4-.1.7.2.3.8 1.3 1.7 2.1 1.1.9 2.1 1.3 2.4 1.4.3.1.5.1.7-.1l.9-1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.4.1.2.1 1-.3 1.6-.3.6-1.5 1.2-2 1.2-.6.1-1.1.3-3.7-.8-3-1.3-4.9-4.4-5.1-4.6-.1-.2-1.2-1.6-1.2-3.1s.8-2.2 1.1-2.5c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5z" fill="currentColor"/>
+    </symbol>
+  </svg>
+
+  <div class="scene" aria-hidden="true">
+    <picture>
+      <source class="scene__poster-wide" media="(min-aspect-ratio: 1/1)" srcset="assets/scenes/burj/wide/001.webp" width="1280" height="720">
+      <img class="scene__poster" src="assets/scenes/burj/001.webp" width="720" height="1280" alt="" fetchpriority="high">
+    </picture>
+    <canvas class="scene__canvas" width="720" height="1280"></canvas>
+    <div class="scene__shade"></div>
+  </div>
+
+  <a class="skip" href="#contact">Skip to the contact form</a>
+
+  <header class="top">
+    <a class="brand" href="#top" aria-label="We Are Ascension, back to top">
+      <svg class="brand__mark" aria-hidden="true" focusable="false"><use href="#mark"/></svg>
+      <span>We Are Ascension</span>
+    </a>
+    <a class="btn btn--sm" href="#contact">Start your project</a>
+  </header>
+
+  <main id="main">
+    <section class="rise" id="top" aria-labelledby="hero-title">
+      <div class="rise__sticky">
+        <div class="intro__copy" data-from="0" data-to="0.1">
+          <p class="kicker">Web design studio · Worldwide</p>
+          <h1 id="hero-title">Websites that make your brand <em>rise</em></h1>
+          <p class="lead">Cinematic, fast websites for ambitious businesses. The team is waiting on the top floor.</p>
+          <div class="actions">
+            <a class="btn" href="#contact">Start your project</a>
+            <p class="rise__cue">Scroll to rise</p>
+          </div>
+        </div>
+        <p class="rise__beat rise__beat--list" data-from="0.16" data-to="0.42"><span>New websites</span> <span>Redesigns</span> <span>Landing pages</span></p>
+        <p class="rise__beat" data-from="0.48" data-to="0.74">Designed to look premium. Built to bring you clients.</p>
+      </div>
+    </section>
+    <button class="rise__skip" type="button">Skip to the form</button>
+
+    <section class="contact-section" id="contact" aria-labelledby="contact-title">
+      <div class="contact-panel">
+        <div class="contact-intro">
+          <p class="kicker">The top floor</p>
+          <h2 id="contact-title" tabindex="-1">Let&rsquo;s make your brand <em>rise</em></h2>
+          <p>Tell the team about your project and we&rsquo;ll get back to you within 24 hours.</p>
+          <div class="wa-cta">
+            <a class="btn" href="https://wa.me/WHATSAPP_NUMBER?text=Hi%20We%20Are%20Ascension!%20I%27d%20like%20to%20talk%20about%20a%20website%20for%20my%20business." data-wa>
+              <svg aria-hidden="true" focusable="false"><use href="#i-chat"/></svg>
+              Chat on WhatsApp
+            </a>
+            <p class="wa-cta__note">The fastest way to reach us.</p>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <p class="form-card__or">Or fill in the form</p>
+          <form class="request" id="request" action="https://api.web3forms.com/submit" method="POST">
+            <input type="hidden" name="access_key" value="WEB3FORMS_ACCESS_KEY">
+            <input type="hidden" name="subject" value="New website request · We Are Ascension">
+            <input type="hidden" name="from_name" value="We Are Ascension website">
+            <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+            <div class="field">
+              <label for="f-name">Name</label>
+              <input id="f-name" name="name" type="text" autocomplete="name" required aria-describedby="e-name">
+              <p class="field__error" id="e-name" hidden>Please tell us your name.</p>
+            </div>
+            <div class="field">
+              <label for="f-email">Email</label>
+              <input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required aria-describedby="e-email">
+              <p class="field__error" id="e-email" hidden>Please enter a valid email.</p>
+            </div>
+            <div class="field">
+              <label for="f-country">Country</label>
+              <select id="f-country" name="country" autocomplete="country-name" required aria-describedby="e-country">
+                <option value="">Select your country</option>
+              <option>Afghanistan</option>
+              <option>Åland Islands</option>
+              <option>Albania</option>
+              <option>Algeria</option>
+              <option>American Samoa</option>
+              <option>Andorra</option>
+              <option>Angola</option>
+              <option>Anguilla</option>
+              <option>Antarctica</option>
+              <option>Antigua &amp; Barbuda</option>
+              <option>Argentina</option>
+              <option>Armenia</option>
+              <option>Aruba</option>
+              <option>Australia</option>
+              <option>Austria</option>
+              <option>Azerbaijan</option>
+              <option>Bahamas</option>
+              <option>Bahrain</option>
+              <option>Bangladesh</option>
+              <option>Barbados</option>
+              <option>Belarus</option>
+              <option>Belgium</option>
+              <option>Belize</option>
+              <option>Benin</option>
+              <option>Bermuda</option>
+              <option>Bhutan</option>
+              <option>Bolivia</option>
+              <option>Bosnia &amp; Herzegovina</option>
+              <option>Botswana</option>
+              <option>Bouvet Island</option>
+              <option>Brazil</option>
+              <option>British Indian Ocean Territory</option>
+              <option>British Virgin Islands</option>
+              <option>Brunei</option>
+              <option>Bulgaria</option>
+              <option>Burkina Faso</option>
+              <option>Burundi</option>
+              <option>Cambodia</option>
+              <option>Cameroon</option>
+              <option>Canada</option>
+              <option>Cape Verde</option>
+              <option>Caribbean Netherlands</option>
+              <option>Cayman Islands</option>
+              <option>Central African Republic</option>
+              <option>Chad</option>
+              <option>Chile</option>
+              <option>China</option>
+              <option>Christmas Island</option>
+              <option>Cocos (Keeling) Islands</option>
+              <option>Colombia</option>
+              <option>Comoros</option>
+              <option>Congo - Brazzaville</option>
+              <option>Congo - Kinshasa</option>
+              <option>Cook Islands</option>
+              <option>Costa Rica</option>
+              <option>Côte d’Ivoire</option>
+              <option>Croatia</option>
+              <option>Cuba</option>
+              <option>Curaçao</option>
+              <option>Cyprus</option>
+              <option>Czechia</option>
+              <option>Denmark</option>
+              <option>Djibouti</option>
+              <option>Dominica</option>
+              <option>Dominican Republic</option>
+              <option>Ecuador</option>
+              <option>Egypt</option>
+              <option>El Salvador</option>
+              <option>Equatorial Guinea</option>
+              <option>Eritrea</option>
+              <option>Estonia</option>
+              <option>Eswatini</option>
+              <option>Ethiopia</option>
+              <option>Falkland Islands</option>
+              <option>Faroe Islands</option>
+              <option>Fiji</option>
+              <option>Finland</option>
+              <option>France</option>
+              <option>French Guiana</option>
+              <option>French Polynesia</option>
+              <option>French Southern Territories</option>
+              <option>Gabon</option>
+              <option>Gambia</option>
+              <option>Georgia</option>
+              <option>Germany</option>
+              <option>Ghana</option>
+              <option>Gibraltar</option>
+              <option>Greece</option>
+              <option>Greenland</option>
+              <option>Grenada</option>
+              <option>Guadeloupe</option>
+              <option>Guam</option>
+              <option>Guatemala</option>
+              <option>Guernsey</option>
+              <option>Guinea</option>
+              <option>Guinea-Bissau</option>
+              <option>Guyana</option>
+              <option>Haiti</option>
+              <option>Heard &amp; McDonald Islands</option>
+              <option>Honduras</option>
+              <option>Hong Kong SAR China</option>
+              <option>Hungary</option>
+              <option>Iceland</option>
+              <option>India</option>
+              <option>Indonesia</option>
+              <option>Iran</option>
+              <option>Iraq</option>
+              <option>Ireland</option>
+              <option>Isle of Man</option>
+              <option>Israel</option>
+              <option>Italy</option>
+              <option>Jamaica</option>
+              <option>Japan</option>
+              <option>Jersey</option>
+              <option>Jordan</option>
+              <option>Kazakhstan</option>
+              <option>Kenya</option>
+              <option>Kiribati</option>
+              <option>Kosovo</option>
+              <option>Kuwait</option>
+              <option>Kyrgyzstan</option>
+              <option>Laos</option>
+              <option>Latvia</option>
+              <option>Lebanon</option>
+              <option>Lesotho</option>
+              <option>Liberia</option>
+              <option>Libya</option>
+              <option>Liechtenstein</option>
+              <option>Lithuania</option>
+              <option>Luxembourg</option>
+              <option>Macao SAR China</option>
+              <option>Madagascar</option>
+              <option>Malawi</option>
+              <option>Malaysia</option>
+              <option>Maldives</option>
+              <option>Mali</option>
+              <option>Malta</option>
+              <option>Marshall Islands</option>
+              <option>Martinique</option>
+              <option>Mauritania</option>
+              <option>Mauritius</option>
+              <option>Mayotte</option>
+              <option>Mexico</option>
+              <option>Micronesia</option>
+              <option>Moldova</option>
+              <option>Monaco</option>
+              <option>Mongolia</option>
+              <option>Montenegro</option>
+              <option>Montserrat</option>
+              <option>Morocco</option>
+              <option>Mozambique</option>
+              <option>Myanmar (Burma)</option>
+              <option>Namibia</option>
+              <option>Nauru</option>
+              <option>Nepal</option>
+              <option>Netherlands</option>
+              <option>New Caledonia</option>
+              <option>New Zealand</option>
+              <option>Nicaragua</option>
+              <option>Niger</option>
+              <option>Nigeria</option>
+              <option>Niue</option>
+              <option>Norfolk Island</option>
+              <option>North Korea</option>
+              <option>North Macedonia</option>
+              <option>Northern Mariana Islands</option>
+              <option>Norway</option>
+              <option>Oman</option>
+              <option>Pakistan</option>
+              <option>Palau</option>
+              <option>Palestinian Territories</option>
+              <option>Panama</option>
+              <option>Papua New Guinea</option>
+              <option>Paraguay</option>
+              <option>Peru</option>
+              <option>Philippines</option>
+              <option>Pitcairn Islands</option>
+              <option>Poland</option>
+              <option>Portugal</option>
+              <option>Puerto Rico</option>
+              <option>Qatar</option>
+              <option>Réunion</option>
+              <option>Romania</option>
+              <option>Russia</option>
+              <option>Rwanda</option>
+              <option>Samoa</option>
+              <option>San Marino</option>
+              <option>São Tomé &amp; Príncipe</option>
+              <option>Saudi Arabia</option>
+              <option>Senegal</option>
+              <option>Serbia</option>
+              <option>Seychelles</option>
+              <option>Sierra Leone</option>
+              <option>Singapore</option>
+              <option>Sint Maarten</option>
+              <option>Slovakia</option>
+              <option>Slovenia</option>
+              <option>Solomon Islands</option>
+              <option>Somalia</option>
+              <option>South Africa</option>
+              <option>South Georgia &amp; South Sandwich Islands</option>
+              <option>South Korea</option>
+              <option>South Sudan</option>
+              <option>Spain</option>
+              <option>Sri Lanka</option>
+              <option>St. Barthélemy</option>
+              <option>St. Helena</option>
+              <option>St. Kitts &amp; Nevis</option>
+              <option>St. Lucia</option>
+              <option>St. Martin</option>
+              <option>St. Pierre &amp; Miquelon</option>
+              <option>St. Vincent &amp; Grenadines</option>
+              <option>Sudan</option>
+              <option>Suriname</option>
+              <option>Svalbard &amp; Jan Mayen</option>
+              <option>Sweden</option>
+              <option>Switzerland</option>
+              <option>Syria</option>
+              <option>Taiwan</option>
+              <option>Tajikistan</option>
+              <option>Tanzania</option>
+              <option>Thailand</option>
+              <option>Timor-Leste</option>
+              <option>Togo</option>
+              <option>Tokelau</option>
+              <option>Tonga</option>
+              <option>Trinidad &amp; Tobago</option>
+              <option>Tunisia</option>
+              <option>Türkiye</option>
+              <option>Turkmenistan</option>
+              <option>Turks &amp; Caicos Islands</option>
+              <option>Tuvalu</option>
+              <option>U.S. Outlying Islands</option>
+              <option>U.S. Virgin Islands</option>
+              <option>Uganda</option>
+              <option>Ukraine</option>
+              <option>United Arab Emirates</option>
+              <option>United Kingdom</option>
+              <option>United States</option>
+              <option>Uruguay</option>
+              <option>Uzbekistan</option>
+              <option>Vanuatu</option>
+              <option>Vatican City</option>
+              <option>Venezuela</option>
+              <option>Vietnam</option>
+              <option>Wallis &amp; Futuna</option>
+              <option>Western Sahara</option>
+              <option>Yemen</option>
+              <option>Zambia</option>
+              <option>Zimbabwe</option>
+              </select>
+              <p class="field__error" id="e-country" hidden>Please choose your country.</p>
+            </div>
+            <div class="field">
+              <label for="f-phone">Phone / WhatsApp <span class="field__opt">(optional)</span></label>
+              <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+1 555 123 4567">
+            </div>
+            <div class="field">
+              <label for="f-business">Business name <span class="field__opt">(optional)</span></label>
+              <input id="f-business" name="business" type="text" autocomplete="organization">
+            </div>
+            <div class="field">
+              <label for="f-website">Current website <span class="field__opt">(optional)</span></label>
+              <input id="f-website" name="website" type="url" inputmode="url" placeholder="https://" aria-describedby="e-website">
+              <p class="field__error" id="e-website" hidden>Please enter the full address, starting with https://</p>
+            </div>
+
+            <fieldset class="field field--wide chips" aria-describedby="e-services">
+              <legend>What do you need?</legend>
+              <div class="chips__list">
+                <label class="chip"><input type="checkbox" name="services" value="New website"><span>New website</span></label>
+                <label class="chip"><input type="checkbox" name="services" value="Redesign"><span>Redesign</span></label>
+                <label class="chip"><input type="checkbox" name="services" value="Landing page"><span>Landing page</span></label>
+                <label class="chip"><input type="checkbox" name="services" value="Online store"><span>Online store</span></label>
+                <label class="chip"><input type="checkbox" name="services" value="Other"><span>Other</span></label>
+              </div>
+              <p class="field__error" id="e-services" hidden>Choose at least one option.</p>
+            </fieldset>
+
+            <div class="field field--wide">
+              <label for="f-message">Tell us about your project <span class="field__opt">(optional)</span></label>
+              <textarea id="f-message" name="message" rows="4"></textarea>
+            </div>
+
+            <button class="btn request__send" type="submit">Send request</button>
+            <p class="request__privacy">We only use your details to reply to your request. Read our <a href="privacy.html">Privacy Policy</a>.</p>
+            <p class="request__status" role="status" aria-live="polite"></p>
+          </form>
+
+          <div class="request__done" id="request-done" tabindex="-1" hidden>
+            <h3>Request sent</h3>
+            <p>Thank you for reaching out. We&rsquo;ll be in touch within 24 hours.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2026 We Are Ascension</p>
+    <ul class="footer-links">
+      <li><a href="https://www.instagram.com/w.weareascension/" rel="noopener" target="_blank">Instagram<span class="sr-only"> (opens in a new tab)</span></a></li>
+      <li><a href="https://www.facebook.com/weareascension" rel="noopener" target="_blank">Facebook<span class="sr-only"> (opens in a new tab)</span></a></li>
+      <li><a href="privacy.html">Privacy Policy</a></li>
+      <li><a href="legal.html">Legal Notice</a></li>
+    </ul>
+  </footer>
+</body>
+</html>
