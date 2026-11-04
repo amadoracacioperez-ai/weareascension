@@ -1,37 +1,64 @@
 /* The rise: the first scroll climbs the building up to the office, where the form is.
-   The scroll through the tall .rise section picks the frame: 96 WebP frames a scene, drawn on a canvas that covers the
-   whole screen, behind the whole page. Each scene has two sets, and the screen's shape picks one (and swaps it when
-   the phone turns or the window changes shape):
+   The scroll through the tall .rise section picks the frame: 192 WebP frames a scene (the video's own 24 a second),
+   drawn on a canvas that covers the whole screen, behind the whole page. Each scene has two sets, and the screen's shape
+   picks one (and swaps it when the phone turns or the window changes shape):
    - tall (9:16, assets/scenes/<scene>/001.webp …), for a screen taller than wide: phones;
    - wide (16:9, assets/scenes/<scene>/wide/001.webp …), for a screen wider than tall: computers.
    What keeps it smooth:
-   - no decoding at draw time. Every frame is fetched once and kept compressed (about 5 MB); the frames near the picture
-     are decoded ahead, off the main thread (createImageBitmap), and let go once the picture has moved on. Drawing a
-     plain <img> instead made the browser decode the WebP on the main thread at every draw: that was the lag;
+   - no decoding at draw time. Every frame is fetched once and kept compressed (about 10 MB); the frames near the
+     picture are decoded ahead, off the main thread (createImageBitmap), and let go once the picture has moved on.
+     Drawing a plain <img> instead made the browser decode the WebP on the main thread at every draw: that was the lag;
    - the canvas has the frames' own size, so each draw is a straight copy, and the graphics card stretches it over the
      screen (object-fit: cover in the CSS). No blurred copies, no filters;
-   - the picture follows the scroll with a little inertia, so the steps of a mouse wheel turn into one glide;
-   - each frame is blended with the next one that is ready, so 12 frames a second move like a film;
+   - the picture follows the scroll with a little inertia, so the steps of a mouse wheel turn into one glide, and each
+     frame is blended with the next one that is ready;
+   - an even pace: the video crawls past the top of the tower and rushes through the window, so the climb is mapped to
+     the video through a pace table measured from the frames (PACE, written by `npm run ritmo`);
+   - no stall when the visitor lets go: the page carries the climb on from the visitor's own speed, at a steady pace,
+     brakes into the office and slides the form in. It does not wait for the scroll to stop and start again from rest.
+     Lifting the finger, a trackpad glide dying out, or a still scroll is letting go. Scrolling back, a touch, a click
+     or a key gives the scroll back to the visitor. Inside the climb the page itself does not move, so the scroll can
+     catch up with the picture unseen; after a finger, it waits for the browser's own glide to end first (iOS ignores
+     a scripted scroll during it);
    - nothing is drawn when the picture would not change.
-   If the visitor lets go on the way up, the page finishes the climb on its own: a short eased flight, cancelled by any
-   wheel, touch, click or key. The header and hero buttons fly to the form too; the Skip button and the skip link jump.
+   The Start buttons climb the same way; the Skip button and the skip link jump.
    Scenes: ?scene=burj (the default) or ?scene=empire.
-   Reduced motion: no climb, no inertia and no flight; the first frame, and the office once the form is in view.
+   Reduced motion: no climb, no inertia and no carrying on; the first frame, and the office once the form is in view.
    Without this script: the first frame as a still picture, a one-screen hero and the form right below it. */
 (function () {
   'use strict';
 
-  var SCENES = { burj: 96, empire: 96 }; // frames in each set of assets/scenes/<scene>/
-  var SETS = { tall: '', wide: 'wide/' }; // the folder of each set inside the scene's
+  var SCENES = { burj: 192, empire: 192 }; // frames in each set of assets/scenes/<scene>/
+  var SETS = { tall: '', wide: 'wide/' };  // the folder of each set inside the scene's
   var DEFAULT_SCENE = 'burj';
-  var LOADING_AT_ONCE = 6;
+  var LOADING_AT_ONCE = 8;
   var DECODING_AT_ONCE = 4;
-  var KEEP = 10;                         // frames kept decoded on each side of the picture (about 3.7 MB each)
-  var FOLLOW = 0.16;                     // share of the gap to the scroll that the picture closes in each 60 Hz frame
-  var BLEND_STEPS = 24;                  // a blend changes in steps this fine, so a still scroll draws nothing
-  var ASSIST_AFTER_MS = 160;             // the scroll is still for this long: the visitor has let go
-  var ASSIST_FROM = 0.015, ASSIST_TO = 0.97;
-  var OFFICE_FROM = 0.9;                 // from here on the camera is in the office
+  var AHEAD = 16, BEHIND = 6, MARGIN = 3; // frames kept decoded ahead (the way the picture moves) and behind; 3.7 MB each
+  var FOLLOW = 0.2;              // share of the gap to the scroll that the picture closes in each 60 Hz frame
+  var BLEND_STEPS = 24;          // a blend changes in steps this fine, so a still scroll draws nothing
+  var ASSIST_FROM = 0.015;       // below this the visitor has not started climbing: no carrying on
+  var CRUISE = 0.4;              // the page's own pace, in shares of the climb a second: all of it in 2.5 s
+  var CRUISE_SETTLE_MS = 300;    // how soon the speed settles from the visitor's to the cruise
+  var BRAKE = 1.2;               // how hard it brakes into the office, in shares of the climb a second, a second
+  var LAND_FROM = 0.97;          // from here on the page slides the form in
+  var IDLE_MS = 140;             // a scroll still for this long, with no finger or button down: the visitor let go
+  var SYNC_AFTER_MS = 90;        // after a finger, the browser's own glide must be over this long before a scripted scroll
+  var OFFICE_FROM = 0.9;         // from here on (a share of the video) the camera is in the office
+
+  // The pace of each set: for 25 evenly spaced points of the video, the share of the climb at which the picture reaches
+  // them. Measured from the frames by scripts/pace.js; run `npm run ritmo` again whenever the frames change.
+  // pace:start (npm run ritmo writes this block)
+  var PACE = {
+    burj: {
+      tall: [0, 0.0294, 0.0631, 0.0995, 0.138, 0.1769, 0.2164, 0.2562, 0.2972, 0.336, 0.3695, 0.3971, 0.4276, 0.4598, 0.4925, 0.5267, 0.5648, 0.6041, 0.6469, 0.6967, 0.7591, 0.8428, 0.9233, 0.9788, 1],
+      wide: [0, 0.0307, 0.0651, 0.1033, 0.1427, 0.1843, 0.2302, 0.2765, 0.3182, 0.3541, 0.3832, 0.4078, 0.4311, 0.4589, 0.4911, 0.5263, 0.5685, 0.6227, 0.6963, 0.7728, 0.8392, 0.894, 0.9371, 0.9718, 1],
+    },
+    empire: {
+      tall: [0, 0.0153, 0.0352, 0.0586, 0.0844, 0.1116, 0.139, 0.1664, 0.1965, 0.2298, 0.2673, 0.308, 0.3463, 0.3787, 0.4139, 0.4545, 0.504, 0.5627, 0.6307, 0.7161, 0.8169, 0.8976, 0.9481, 0.9808, 1],
+      wide: [0, 0.0181, 0.0397, 0.0651, 0.0948, 0.1281, 0.1635, 0.1995, 0.2344, 0.2715, 0.3092, 0.3465, 0.3819, 0.4181, 0.4574, 0.4979, 0.5494, 0.62, 0.7085, 0.7933, 0.8535, 0.9006, 0.9395, 0.9731, 1],
+    },
+  };
+  // pace:end
 
   var html = document.documentElement;
   var canvas = document.querySelector('.scene__canvas');
@@ -48,13 +75,15 @@
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var wideScreen = window.matchMedia('(min-aspect-ratio: 1/1)'); // the same test as the poster's <source>
   var set = wideScreen.matches ? 'wide' : 'tall';
+  var pace = paceOf(set);
   var ctx = canvas.getContext('2d', { alpha: false });
 
   // Read by the tests, and handy in the console. loaded: frames fetched; decoded: frames ready to draw right now.
-  // assist: whether the page finishes the climb on its own; the tests turn it off to stand still half way up.
+  // flying: the page is carrying the climb on or scrolling to the form. assist: whether it carries the climb on when
+  // the visitor lets go; the tests turn it off to stand still half way up. frameAt(p): the frame at p of the climb.
   var state = window.__rise = {
     scene: scene, set: set, frames: count, loaded: 0, decoded: 0, drawn: -1, draws: 0, progress: 0, shown: 0,
-    phase: 'start', flying: false, assist: true
+    phase: 'start', flying: false, assist: true, frameAt: frameAt
   };
   html.dataset.scene = scene;
 
@@ -65,7 +94,26 @@
   if (poster && poster.getAttribute('src') !== src(0, 'tall')) poster.setAttribute('src', src(0, 'tall'));
   if (posterWide && posterWide.getAttribute('srcset') !== src(0, 'wide')) posterWide.setAttribute('srcset', src(0, 'wide'));
 
-  /* ---------- fetching: the first and last frames, then halving the gaps, so a rough climb works early ---------- */
+  /* ---------- the pace: from the climb to the video ---------- */
+
+  function paceOf(which) {
+    var knots = PACE[scene] && PACE[scene][which];
+    return knots && knots.length > 1 ? knots : [0, 1];
+  }
+
+  // The share of the video shown at p of the climb (both from 0 to 1).
+  function videoAt(p) {
+    if (p <= 0) return 0;
+    if (p >= 1) return 1;
+    var n = pace.length - 1;
+    var j = 0;
+    while (j < n - 1 && pace[j + 1] < p) j++;
+    return (j + (p - pace[j]) / (pace[j + 1] - pace[j])) / n;
+  }
+
+  function frameAt(p) { return videoAt(p) * (count - 1); }
+
+  /* ---------- fetching: the ends, then halving the gaps (so a rough climb works early), and what is just ahead ---------- */
 
   function loadingOrder(n) {
     var out = [0, n - 1];
@@ -79,16 +127,18 @@
     return out;
   }
 
-  var queue, active, blobs, bitmaps, pending, decoding;
+  var queue, active, asked, blobs, bitmaps, pending, decoding, aheadTurn;
   var generation = 0; // goes up when the set changes, so what was still arriving for the old set is dropped
 
   function startSet() {
     queue = reduced ? [0, count - 1] : loadingOrder(count);
     active = 0;
+    asked = [];    // frames requested
     blobs = [];    // the compressed frames: all of them, once they arrive
     bitmaps = [];  // the decoded frames: only those near the picture
     pending = [];  // frames being decoded right now
     decoding = 0;
+    aheadTurn = false;
     state.loaded = 0;
     state.decoded = 0;
   }
@@ -100,6 +150,7 @@
     generation++;
     for (var i = 0; i < count; i++) if (bitmaps[i] && bitmaps[i].close) bitmaps[i].close();
     set = state.set = which;
+    pace = paceOf(set);
     startSet();
     lastDrawn = '';
     keptAround = -1;
@@ -107,12 +158,41 @@
     pump();
   }
 
+  // The first frame not yet asked for just ahead of the picture.
+  function missingAhead() {
+    var c = centre();
+    for (var d = 0; d <= AHEAD; d++) {
+      var i = c + dir * d;
+      if (i >= 0 && i < count && !asked[i]) return i;
+    }
+    return -1;
+  }
+
+  // Turn about: a frame just ahead of the picture, then the next one of the loading order.
+  function nextToLoad() {
+    if (!reduced && aheadTurn) {
+      var a = missingAhead();
+      if (a >= 0) { aheadTurn = false; return a; }
+    }
+    aheadTurn = true;
+    while (queue.length) {
+      var q = queue.shift();
+      if (!asked[q]) return q;
+    }
+    return reduced ? -1 : missingAhead();
+  }
+
   function pump() {
-    while (active < LOADING_AT_ONCE && queue.length) load(queue.shift());
+    while (active < LOADING_AT_ONCE) {
+      var i = nextToLoad();
+      if (i < 0) return;
+      load(i);
+    }
   }
 
   function load(i) {
     var gen = generation;
+    asked[i] = true;
     active++;
     fetch(src(i)).then(function (response) {
       if (!response.ok) throw new Error('HTTP ' + response.status);
@@ -147,11 +227,15 @@
     });
   }
 
-  function centre() { return Math.round(shown * (count - 1)); }
+  var dir = 1; // the way the picture last moved: 1 up the building, -1 back down
+
+  function centre() { return Math.round(frameAt(shown)); }
 
   // The first and last frames always stay: the foot of the building and the office are where jumps land.
-  function wantedNear(i, c, reach) {
-    return i === 0 || i === count - 1 || Math.abs(i - c) <= reach;
+  function wantedNear(i, c) {
+    if (i === 0 || i === count - 1) return true;
+    var d = (i - c) * dir;
+    return d >= -(BEHIND + MARGIN) && d <= AHEAD + MARGIN;
   }
 
   function release(i) {
@@ -170,7 +254,7 @@
       if (gen !== generation) { if (bmp.close) bmp.close(); return; }
       pending[i] = false;
       decoding--;
-      if (!wantedNear(i, centre(), KEEP + 3)) {
+      if (!wantedNear(i, centre())) {
         if (bmp.close) bmp.close(); // the picture moved on while this one decoded
       } else {
         // The canvas takes the frames' own size, so drawing is a copy and never a resize.
@@ -195,14 +279,18 @@
   function keepNear() {
     var c = centre();
     if (c !== keptAround) {
+      if (keptAround >= 0) dir = c > keptAround ? 1 : -1;
       keptAround = c;
-      for (var i = 0; i < count; i++) if (bitmaps[i] && !wantedNear(i, c, KEEP + 3)) release(i);
+      for (var i = 0; i < count; i++) if (bitmaps[i] && !wantedNear(i, c)) release(i);
     }
-    // The nearest first, then outwards; the two ends last.
-    for (var d = 0; d <= KEEP && decoding < DECODING_AT_ONCE; d++) {
-      tryDecode(c + d);
-      if (d) tryDecode(c - d);
-    }
+    // The frame on screen and the next; then every other frame ahead (a fast climb only shows some of them anyway),
+    // the rest ahead, and those behind. The two ends last.
+    var d;
+    tryDecode(c);
+    tryDecode(c + dir);
+    for (d = 2; d <= AHEAD; d += 2) tryDecode(c + dir * d);
+    for (d = 3; d <= AHEAD; d += 2) tryDecode(c + dir * d);
+    for (d = 1; d <= BEHIND; d++) tryDecode(c - dir * d);
     tryDecode(0);
     tryDecode(count - 1);
   }
@@ -215,9 +303,9 @@
   function above(i) { for (var j = i; j < count; j++) if (bitmaps[j]) return j; return -1; }
 
   // Draws the climb at p (0 at the foot of the building, 1 in the office): the nearest decoded frame on each side,
-  // blended by how close p is to each.
+  // blended by how close the picture is to each.
   function draw(p) {
-    var f = p * (count - 1);
+    var f = frameAt(p);
     var a = Math.floor(f);
     var A = below(a);
     var B = above(Math.min(count - 1, a + 1));
@@ -272,9 +360,13 @@
   /* ---------- the scroll: where we are on the climb ---------- */
 
   var start = 0, end = 1;
-  var wanted = 0;   // where the scroll is on the climb
-  var shown = 0;    // where the picture is: it follows wanted with a little inertia
+  var wanted = 0;    // where the scroll is on the climb
+  var shown = 0;     // where the picture is: it follows wanted with a little inertia, or the page carries it on
+  var speed = 0;     // how fast the picture moves, in shares of the climb a second
+  var scrollSpeed = 0, lastScrollY = window.scrollY; // how fast the page scrolls, in pixels a second
   var req = 0, lastTime = 0;
+  var carry = null;  // the page carrying the climb on: { speed, landing, arrive }
+  var flight = 0;    // the page scrolling on its own (to the form)
 
   function setPhase(phase) {
     if (state.phase === phase) return;
@@ -282,20 +374,37 @@
     html.dataset.phase = phase;
   }
 
+  function climbY(p) { return start + (end - start) * p; }
+
   function tick(now) {
     req = 0;
-    var dt = lastTime ? Math.min(100, now - lastTime) : 16.7;
+    var dt = lastTime ? Math.min(100, Math.max(1, now - lastTime)) : 16.7;
     lastTime = now;
+    var before = shown;
     var gap = wanted - shown;
-    if (reduced || Math.abs(gap) < 0.0004) shown = wanted;
-    else shown += gap * (1 - Math.pow(1 - FOLLOW, dt / 16.7));
-    state.shown = shown;
+    var next = reduced || Math.abs(gap) < 0.0004 ? wanted : shown + gap * (1 - Math.pow(1 - FOLLOW, dt / 16.7));
+    if (carry && shown < 1) {
+      // The visitor's own glide leads while it is faster; then the page keeps the pace and brakes into the office.
+      carry.speed += (CRUISE - carry.speed) * (1 - Math.exp(-dt / CRUISE_SETTLE_MS));
+      carry.speed = Math.min(carry.speed, Math.sqrt(2 * BRAKE * (1 - shown)) + 0.02);
+      next = Math.min(1, Math.max(next, shown + carry.speed * dt / 1000));
+      if (1 - next < 0.0004) next = 1;
+      carry.speed = Math.max(carry.speed, (next - shown) * 1000 / dt);
+    }
+    shown = state.shown = next;
+    speed = (shown - before) * 1000 / dt;
+    var y = window.scrollY;
+    scrollSpeed = 0.5 * scrollSpeed + 0.5 * (y - lastScrollY) * 1000 / dt;
+    lastScrollY = y;
+    if (carry) followPicture(now);
+    else maybeCarry(now);
     keepNear();
     draw(shown);
     if (!reduced) overlays(shown);
-    html.classList.toggle('at-top', shown >= OFFICE_FROM);
-    if (shown !== wanted) req = requestAnimationFrame(tick);
-    else lastTime = 0;
+    html.classList.toggle('at-top', videoAt(shown) >= OFFICE_FROM);
+    // Starting to carry the climb on, or a flight, may have asked for the next frame already: ask only once.
+    if (shown !== wanted || carry || flight || Math.abs(scrollSpeed) > 1) { if (!req) req = requestAnimationFrame(tick); }
+    else if (!req) { lastTime = 0; speed = 0; scrollSpeed = 0; }
   }
 
   function schedule() {
@@ -322,51 +431,108 @@
     schedule();
   }
 
-  /* ---------- flights: finishing the climb, and the buttons that lead to the form ---------- */
+  /* ---------- the visitor: fingers, wheels, buttons and keys ---------- */
 
-  var flight = 0;
-  var idle = 0;
-  var lastY = window.scrollY;
-  var flownTo = -1; // where the last flight step put the page: its scroll event must not start another flight
+  var touching = false, mouseHeld = false, lastInput = '';
+  var released = false;        // the visitor let go: lifted the finger, or a wheel glide is dying out
+  var lastVisitorScroll = 0;   // when the visitor last moved the scroll
+  var cancelledAt = 0;         // when the visitor last took the scroll back
+  var lastDir = 0;             // the way the visitor last scrolled: 1 down the page (up the building), -1 back
+  var ownY = -1;               // where the page's own last scroll put it: its scroll event is not the visitor's
+  var lastWheel = 0, wheelDecay = 0, idle = 0;
 
   function contactTop() {
     return contact.getBoundingClientRect().top + window.scrollY;
   }
 
-  function ease(t) {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  function scrollOwn(y) {
+    window.scrollTo({ top: y, behavior: 'instant' });
+    ownY = window.scrollY;
   }
 
-  function flyTo(y, ms, then) {
-    cancelFlight();
-    var from = window.scrollY;
-    var t0 = performance.now();
-    state.flying = true;
-    function step(now) {
-      var t = Math.min(1, (now - t0) / ms);
-      window.scrollTo({ top: from + (y - from) * ease(t), behavior: 'instant' });
-      flownTo = window.scrollY;
-      if (t < 1) {
-        flight = requestAnimationFrame(step);
-      } else {
-        flight = 0;
-        state.flying = false;
-        if (then) then();
-      }
-    }
-    flight = requestAnimationFrame(step);
-  }
-
-  function cancelFlight() {
+  // The visitor takes the scroll back. If the picture was ahead of the scroll (a finger's glide was still on), the scroll
+  // goes where the picture is first, so nothing jumps back.
+  function cancel() {
     clearTimeout(idle);
     if (flight) cancelAnimationFrame(flight);
     flight = 0;
+    if (carry && shown < 1 && climbY(shown) > window.scrollY + 1) scrollOwn(climbY(shown));
+    carry = null;
+    released = false;
+    wheelDecay = 0;
+    cancelledAt = performance.now();
     state.flying = false;
   }
 
-  ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(function (type) {
-    window.addEventListener(type, cancelFlight, { passive: true });
-  });
+  function letGo(now) {
+    if (touching || mouseHeld) return false;
+    return released || now - lastVisitorScroll >= IDLE_MS;
+  }
+
+  // Carry the climb on once the visitor has let go on the way up and the picture is slower than the page's own pace.
+  function maybeCarry(now) {
+    if (carry || flight || reduced || !state.assist) return;
+    if (lastDir <= 0 || lastVisitorScroll <= cancelledAt || state.progress <= ASSIST_FROM) return;
+    if (!letGo(now)) return;
+    if (shown < 1) {
+      if (speed < CRUISE) startCarry(Math.max(0, speed), false);
+    } else if (now - lastVisitorScroll >= IDLE_MS) {
+      // Let go between the office and the form: slide the form the rest of the way in.
+      var y = contactTop();
+      if (window.scrollY < y - 2) flyTo(y, 500 + 0.4 * (y - window.scrollY), Math.max(0, scrollSpeed));
+    }
+  }
+
+  function startCarry(from, arriveAfter) {
+    if (flight) cancelAnimationFrame(flight);
+    flight = 0;
+    clearTimeout(idle);
+    carry = { speed: from, landing: false, arrive: arriveAfter };
+    state.flying = true;
+    schedule();
+  }
+
+  // While the page carries the climb on: the scroll keeps up with the picture (unseen: the page does not move inside the
+  // climb), and near the office the form slides in.
+  function followPicture(now) {
+    if (carry.landing || touching || mouseHeld) return;
+    if (lastInput === 'touch' && now - lastVisitorScroll < SYNC_AFTER_MS) return; // the browser's own glide is still on
+    var y = climbY(shown);
+    if (y > window.scrollY + 0.5) scrollOwn(y);
+    if (shown < LAND_FROM || window.scrollY < climbY(LAND_FROM) - 2) return;
+    var to = contactTop();
+    if (window.scrollY >= to - 2) { carry = null; state.flying = false; return; } // the visitor went past the form
+    carry.landing = true;
+    var then = carry.arrive ? arrive : null;
+    flyTo(to, 500 + 0.4 * (to - window.scrollY), Math.max(0, scrollSpeed), function () {
+      carry = null;
+      if (then) then();
+    });
+  }
+
+  // Scrolls to y in ms, starting at v0 pixels a second and coming to rest there (a cubic Hermite curve, which never
+  // overshoots with the starting speed capped).
+  function flyTo(y, ms, v0, then) {
+    if (flight) cancelAnimationFrame(flight);
+    var from = window.scrollY;
+    var dist = y - from;
+    var m = dist > 0 ? Math.min(3 * dist, Math.max(0, (v0 || 0) * ms / 1000)) : 0;
+    var t0 = performance.now();
+    state.flying = true;
+    function step(now) {
+      var s = Math.min(1, (now - t0) / ms);
+      scrollOwn(from + (s * s * s - 2 * s * s + s) * m + (3 * s * s - 2 * s * s * s) * dist);
+      if (s < 1) {
+        flight = requestAnimationFrame(step);
+        return;
+      }
+      flight = 0;
+      if (then) then();
+      if (!carry) state.flying = false;
+    }
+    flight = requestAnimationFrame(step);
+    schedule();
+  }
 
   function arrive() {
     var title = document.getElementById('contact-title');
@@ -374,37 +540,65 @@
   }
 
   function jump() {
-    cancelFlight();
-    window.scrollTo({ top: contactTop(), behavior: 'instant' });
+    cancel();
+    scrollOwn(contactTop());
     arrive();
   }
 
-  window.addEventListener('scroll', function () {
-    var y = window.scrollY;
-    var down = y > lastY;
-    lastY = y;
-    update();
-    if (flight || reduced) return;
-    // The page's own flight, landing after a click stopped it: not the visitor scrolling.
-    if (Math.abs(y - flownTo) < 1) return;
-    flownTo = -1;
-    clearTimeout(idle);
-    if (down && state.assist && state.progress > ASSIST_FROM && state.progress < ASSIST_TO) {
-      idle = setTimeout(function () {
-        if (flight) return;
-        flyTo(contactTop(), 700 + 3000 * (1 - state.progress));
-      }, ASSIST_AFTER_MS);
-    }
+  window.addEventListener('touchstart', function (event) {
+    touching = true;
+    lastInput = 'touch';
+    if (event.touches.length) cancel();
+  }, { passive: true });
+  function touchOver(event) {
+    if (event.touches.length) return;
+    touching = false;
+    if (lastDir > 0) released = true;
+    schedule();
+  }
+  window.addEventListener('touchend', touchOver, { passive: true });
+  window.addEventListener('touchcancel', touchOver, { passive: true });
+
+  // A trackpad's glide sends shrinking steps: a few in a row and the visitor has let go. A step back is taking over.
+  window.addEventListener('wheel', function (event) {
+    lastInput = 'wheel';
+    var d = event.deltaY;
+    if (d < 0) { cancel(); lastWheel = 0; return; }
+    if (d < lastWheel - 0.01) wheelDecay++;
+    else if (d > lastWheel + 0.01) wheelDecay = 0;
+    lastWheel = d;
+    released = wheelDecay >= 4;
   }, { passive: true });
 
-  // Links to the form fly there. The skip link (and every link under reduced motion) jumps at once, as it should.
+  window.addEventListener('mousedown', function () { mouseHeld = true; lastInput = 'mouse'; cancel(); }, { passive: true });
+  window.addEventListener('mouseup', function () { mouseHeld = false; schedule(); }, { passive: true });
+  window.addEventListener('keydown', function () { lastInput = 'key'; cancel(); }, { passive: true });
+
+  window.addEventListener('scroll', function () {
+    var y = window.scrollY;
+    var mine = Math.abs(y - ownY) < 1;
+    if (!mine) {
+      ownY = -1;
+      if (y > lastY + 0.5) lastDir = 1;
+      else if (y < lastY - 0.5) lastDir = -1;
+      lastVisitorScroll = performance.now();
+      clearTimeout(idle);
+      if (!reduced) idle = setTimeout(function () { maybeCarry(performance.now()); }, IDLE_MS + 10);
+    }
+    lastY = y;
+    update();
+  }, { passive: true });
+  var lastY = window.scrollY;
+
+  // Links to the form climb there. The skip link (and every link under reduced motion) jumps at once, as it should.
   document.addEventListener('click', function (event) {
     var link = event.target.closest && event.target.closest('a[href="#contact"]');
     if (!link) return;
     event.preventDefault();
     if (link.classList.contains('skip') || reduced) { jump(); return; }
-    var distance = Math.abs(contactTop() - window.scrollY);
-    flyTo(contactTop(), Math.min(4200, 900 + distance * 0.9), arrive);
+    if (shown < LAND_FROM && window.scrollY < end) { startCarry(0, true); return; }
+    var y = contactTop();
+    flyTo(y, Math.min(1800, 600 + 0.5 * Math.abs(y - window.scrollY)), 0, arrive);
   });
 
   if (skipBtn) skipBtn.addEventListener('click', jump);
