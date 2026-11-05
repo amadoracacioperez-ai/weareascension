@@ -1,11 +1,11 @@
 /* The rise: the first scroll climbs the building up to the office, where the form is.
-   The scroll through the tall .rise section picks the frame: 192 WebP frames a scene (the video's own 24 a second),
+   The scroll through the tall .rise section picks the frame: every frame of the video (its own 24 a second) as a WebP,
    drawn on a canvas that covers the whole screen, behind the whole page. Each scene has two sets, and the screen's shape
    picks one (and swaps it when the phone turns or the window changes shape):
    - tall (9:16, assets/scenes/<scene>/001.webp …), for a screen taller than wide: phones;
    - wide (16:9, assets/scenes/<scene>/wide/001.webp …), for a screen wider than tall: computers.
    What keeps it smooth:
-   - no decoding at draw time. Every frame is fetched once and kept compressed (about 10 MB); the frames near the
+   - no decoding at draw time. Every frame is fetched once and kept compressed (10 to 25 MB); the frames near the
      picture are decoded ahead, off the main thread (createImageBitmap), and let go once the picture has moved on.
      Drawing a plain <img> instead made the browser decode the WebP on the main thread at every draw: that was the lag;
    - the canvas has the frames' own size, so each draw is a straight copy, and the graphics card stretches it over the
@@ -28,7 +28,6 @@
 (function () {
   'use strict';
 
-  var SCENES = { burj: 192, empire: 192 }; // frames in each set of assets/scenes/<scene>/
   var SETS = { tall: '', wide: 'wide/' };  // the folder of each set inside the scene's
   var DEFAULT_SCENE = 'burj';
   var LOADING_AT_ONCE = 8;
@@ -45,13 +44,18 @@
   var SYNC_AFTER_MS = 90;        // after a finger, the browser's own glide must be over this long before a scripted scroll
   var OFFICE_FROM = 0.9;         // from here on (a share of the video) the camera is in the office
 
-  // The pace of each set: for 25 evenly spaced points of the video, the share of the climb at which the picture reaches
-  // them. Measured from the frames by scripts/pace.js; run `npm run ritmo` again whenever the frames change.
+  // The frames of each set (each video has its own), and its pace: for 25 evenly spaced points of the video, the share
+  // of the climb at which the picture reaches them. Both come from the frames, through scripts/pace.js: run
+  // `npm run ritmo` again whenever they change (`npm run fotogramas` does).
   // pace:start (npm run ritmo writes this block)
+  var SCENES = {
+    burj: { tall: 192, wide: 193 },
+    empire: { tall: 192, wide: 192 },
+  };
   var PACE = {
     burj: {
       tall: [0, 0.0294, 0.0631, 0.0995, 0.138, 0.1769, 0.2164, 0.2562, 0.2972, 0.336, 0.3695, 0.3971, 0.4276, 0.4598, 0.4925, 0.5267, 0.5648, 0.6041, 0.6469, 0.6967, 0.7591, 0.8428, 0.9233, 0.9788, 1],
-      wide: [0, 0.0307, 0.0651, 0.1033, 0.1427, 0.1843, 0.2302, 0.2765, 0.3182, 0.3541, 0.3832, 0.4078, 0.4311, 0.4589, 0.4911, 0.5263, 0.5685, 0.6227, 0.6963, 0.7728, 0.8392, 0.894, 0.9371, 0.9718, 1],
+      wide: [0, 0.0179, 0.0358, 0.0544, 0.0739, 0.0944, 0.1164, 0.1418, 0.1739, 0.2132, 0.2639, 0.3172, 0.3658, 0.4055, 0.4434, 0.4852, 0.5357, 0.5921, 0.6577, 0.7416, 0.8276, 0.8991, 0.9487, 0.977, 1],
     },
     empire: {
       tall: [0, 0.0153, 0.0352, 0.0586, 0.0844, 0.1116, 0.139, 0.1664, 0.1965, 0.2298, 0.2673, 0.308, 0.3463, 0.3787, 0.4139, 0.4545, 0.504, 0.5627, 0.6307, 0.7161, 0.8169, 0.8976, 0.9481, 0.9808, 1],
@@ -71,10 +75,10 @@
 
   var param = new URLSearchParams(location.search).get('scene');
   var scene = Object.prototype.hasOwnProperty.call(SCENES, param) ? param : DEFAULT_SCENE;
-  var count = SCENES[scene];
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var wideScreen = window.matchMedia('(min-aspect-ratio: 1/1)'); // the same test as the poster's <source>
   var set = wideScreen.matches ? 'wide' : 'tall';
+  var count = SCENES[scene][set];
   var pace = paceOf(set);
   var ctx = canvas.getContext('2d', { alpha: false });
 
@@ -150,6 +154,7 @@
     generation++;
     for (var i = 0; i < count; i++) if (bitmaps[i] && bitmaps[i].close) bitmaps[i].close();
     set = state.set = which;
+    count = state.frames = SCENES[scene][set];
     pace = paceOf(set);
     startSet();
     lastDrawn = '';
