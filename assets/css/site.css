@@ -108,6 +108,42 @@ h1 em, h2 em { font-style: italic; color: var(--accent-ink); }
 }
 .link:hover { text-decoration-color: var(--accent); }
 
+/* ---------- The way in: the logo on black, then the page ---------- */
+
+/* The script in <head> sets data-splash, on someone arriving from outside: "on", then "out" for the fade. The page behind
+   stays shut until the fade starts, and any scrollbar it brings back appears while the black still covers everything. */
+.splash { display: none; }
+html[data-splash] { background: #000; }
+html[data-splash="on"] { overflow: hidden; }
+html[data-splash] .splash {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: #000;
+  color: var(--on-photo);
+  touch-action: none;
+}
+html[data-splash="out"] .splash { opacity: 0; pointer-events: none; transition: opacity 0.8s ease; }
+.splash__logo { display: grid; justify-items: center; gap: 1.1rem; animation: splash-in 1.3s var(--ease) 0.15s both; }
+.splash__mark { width: 3.5rem; height: 3.5rem; }
+.splash__name { font: 500 1.4rem/1 var(--serif); letter-spacing: 0.04em; }
+@keyframes splash-in {
+  from { opacity: 0; filter: blur(14px); }
+  to { opacity: 1; filter: blur(0); }
+}
+/* The page arrives as the black lifts: the hero line by line, then the header. */
+html.js .top,
+html.js .intro__copy > * { transition: opacity 1s var(--ease), transform 1s var(--ease); }
+html[data-splash="on"] .top,
+html[data-splash="on"] .intro__copy > * { opacity: 0; transform: translateY(1rem); }
+html[data-splash="out"] .intro__copy > :nth-child(1) { transition-delay: 0.2s; }
+html[data-splash="out"] .intro__copy > :nth-child(2) { transition-delay: 0.3s; }
+html[data-splash="out"] .intro__copy > :nth-child(3) { transition-delay: 0.4s; }
+html[data-splash="out"] .intro__copy > :nth-child(4) { transition-delay: 0.5s; }
+html[data-splash="out"] .top { transition-delay: 0.6s; }
+
 /* ---------- The scene: the whole screen, on every screen ---------- */
 
 /* Behind the whole page. The poster (the first frame) is there before anything loads; the canvas, with the frames' own
@@ -265,34 +301,6 @@ html.js .rise__sticky {
 }
 html:not(.js) .rise__cue { display: none; }
 
-/* The lines on the way up: rise.js fades them in and out as you climb past them. */
-.rise__beat {
-  position: relative;
-  isolation: isolate;
-  align-self: center;
-  justify-self: center;
-  max-width: 22ch;
-  margin: 0;
-  font: italic 500 clamp(2rem, 1.2rem + 3.6vw, 3.6rem) / 1.08 var(--serif);
-  text-align: center;
-  text-wrap: balance;
-  text-shadow: 0 0.1em 1.2em rgb(20 16 12 / 0.45);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  will-change: opacity, transform;
-}
-/* A soft dark halo keeps the line readable over bright sky and glass. */
-.rise__beat::before {
-  content: "";
-  position: absolute;
-  inset: -45% -25%;
-  z-index: -1;
-  background: radial-gradient(closest-side, rgb(20 16 12 / 0.42), rgb(20 16 12 / 0.18) 55%, transparent);
-}
-.rise__beat--list { font-style: normal; }
-.rise__beat--list span { display: block; }
-html:not(.js) .rise__beat { display: none; }
 html.js .intro__copy { will-change: opacity, transform; }
 
 .rise__skip {
@@ -526,5 +534,4 @@ html:not(.js) .rise__skip { display: none; }
   /* No climb: the hero is one screen, with the form right below it. */
   html.js .rise { height: auto; }
   html.js .rise__sticky { position: relative; }
-  .rise__beat { display: none; }
 }

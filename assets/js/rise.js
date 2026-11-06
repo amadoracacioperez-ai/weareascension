@@ -335,7 +335,7 @@
     if (canvas.dataset.state !== 'ready') canvas.dataset.state = 'ready';
   }
 
-  /* ---------- the texts on the way up ---------- */
+  /* ---------- the hero steps back as the climb starts ---------- */
 
   var texts = Array.prototype.slice.call(document.querySelectorAll('.rise [data-from]')).map(function (el) {
     return { el: el, from: Number(el.dataset.from), to: Number(el.dataset.to), o: '' };
@@ -357,7 +357,6 @@
       it.o = os;
       it.el.style.opacity = os;
       it.el.style.transform = 'translate3d(0,' + ((1 - o) * (p < it.from + fade ? 16 : -16)).toFixed(1) + 'px,0)';
-      // 'visible', not '': the lines start hidden in the CSS, and clearing the style would hide them again.
       it.el.style.visibility = o < 0.01 ? 'hidden' : 'visible';
     });
   }

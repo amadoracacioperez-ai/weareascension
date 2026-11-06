@@ -17,6 +17,33 @@
       var d = document.documentElement;
       d.classList.add('js');
       window.addEventListener('load', function () { if (!window.__riseReady) d.classList.remove('js'); });
+
+      // The way in: the logo on black for a few seconds, as on wearebrand.io, while the first frames arrive behind it.
+      // Only for someone arriving from outside: not at #contact, not coming back from the legal pages, and not with
+      // reduced motion (the tests set __noSplash). A slow first frame holds it, but never past LONGEST.
+      var HOLD = 2600, LONGEST = 5000, FADE = 800;
+      var cameBack = performance.getEntriesByType('navigation').some(function (n) { return n.type === 'back_forward'; });
+      if (window.__noSplash || location.hash || cameBack || document.referrer.indexOf(location.origin) === 0 ||
+          matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var theme = document.querySelector('meta[name="theme-color"]');
+      var paper = theme.content;
+      var open = false;
+      function reveal() {
+        if (open) return;
+        open = true;
+        d.dataset.splash = 'out';
+        theme.content = paper;
+        setTimeout(function () { delete d.dataset.splash; }, FADE);
+      }
+      d.dataset.splash = 'on';
+      theme.content = '#000000';
+      setTimeout(function () {
+        var first = document.querySelector('.scene__poster');
+        if (!first || first.complete) { reveal(); return; }
+        first.addEventListener('load', reveal);
+        first.addEventListener('error', reveal);
+        setTimeout(reveal, LONGEST - HOLD);
+      }, HOLD);
     }());
   </script>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -37,6 +64,13 @@
       <path d="M9.1 8.2c.2.5.6 1.4.7 1.6.1.2.1.4 0 .6l-.5.7c-.1.2-.3.4-.1.7.2.3.8 1.3 1.7 2.1 1.1.9 2.1 1.3 2.4 1.4.3.1.5.1.7-.1l.9-1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.4.1.2.1 1-.3 1.6-.3.6-1.5 1.2-2 1.2-.6.1-1.1.3-3.7-.8-3-1.3-4.9-4.4-5.1-4.6-.1-.2-1.2-1.6-1.2-3.1s.8-2.2 1.1-2.5c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5z" fill="currentColor"/>
     </symbol>
   </svg>
+
+  <div class="splash" aria-hidden="true">
+    <div class="splash__logo">
+      <svg class="splash__mark" focusable="false"><use href="#mark"/></svg>
+      <span class="splash__name">We Are Ascension</span>
+    </div>
+  </div>
 
   <div class="scene" aria-hidden="true">
     <picture>
@@ -69,8 +103,6 @@
             <p class="rise__cue">Scroll to rise</p>
           </div>
         </div>
-        <p class="rise__beat rise__beat--list" data-from="0.16" data-to="0.42"><span>New websites</span> <span>Redesigns</span> <span>Landing pages</span></p>
-        <p class="rise__beat" data-from="0.48" data-to="0.74">Designed to look premium. Built to bring you clients.</p>
       </div>
     </section>
     <button class="rise__skip" type="button">Skip to the form</button>
@@ -82,7 +114,7 @@
           <h2 id="contact-title" tabindex="-1">Let&rsquo;s make your brand <em>rise</em></h2>
           <p>Tell the team about your project and we&rsquo;ll get back to you within 24 hours.</p>
           <div class="wa-cta">
-            <a class="btn" href="https://wa.me/WHATSAPP_NUMBER?text=Hi%20We%20Are%20Ascension!%20I%27d%20like%20to%20talk%20about%20a%20website%20for%20my%20business." data-wa>
+            <a class="btn" href="https://wa.me/34678293757?text=Hi%20We%20Are%20Ascension!%20I%27d%20like%20to%20talk%20about%20a%20website%20for%20my%20business." data-wa>
               <svg aria-hidden="true" focusable="false"><use href="#i-chat"/></svg>
               Chat on WhatsApp
             </a>
@@ -93,7 +125,7 @@
         <div class="form-card">
           <p class="form-card__or">Or fill in the form</p>
           <form class="request" id="request" action="https://api.web3forms.com/submit" method="POST">
-            <input type="hidden" name="access_key" value="WEB3FORMS_ACCESS_KEY">
+            <input type="hidden" name="access_key" value="a01f7e6b-82eb-440a-a64b-12863a4324ae">
             <input type="hidden" name="subject" value="New website request · We Are Ascension">
             <input type="hidden" name="from_name" value="We Are Ascension website">
             <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
