@@ -1,7 +1,7 @@
-/* We Are Ascension: the link-in-bio page. Quiet luxury, taken from the two scenes: ivory and sand paper, a warm
-   brown ink, and a bronze accent (deeper on the Empire State, whose office is mahogany). Cormorant Garamond for the
-   headlines, Jost for everything else. The climb fills the whole screen on every screen, behind the whole page, and
-   the form waits on the top floor. Self-hosted fonts, no requests to other sites. */
+/* We Are Ascension: the link-in-bio page. Quiet luxury, taken from the two scenes: a warm brown ink, a bronze accent
+   (deeper on the Empire State, whose office is mahogany) and champagne gold on the dark office. Cormorant Garamond for
+   the headlines, Jost for everything else. The climb fills the whole screen on every screen, behind the whole page, and
+   the form waits on the top floor, on a pane of smoked glass. Self-hosted fonts, no requests to other sites. */
 
 @font-face { font-family: "Cormorant Garamond"; font-weight: 500; font-style: normal; font-display: swap; src: url("../fonts/cormorant-garamond-latin-500-normal.woff2") format("woff2"); }
 @font-face { font-family: "Cormorant Garamond"; font-weight: 500; font-style: italic; font-display: swap; src: url("../fonts/cormorant-garamond-latin-500-italic.woff2") format("woff2"); }
@@ -23,6 +23,9 @@
   --accent: #9c7f5c;
   --accent-ink: #6e5638;
   --sand: #dcc4a0;  /* the accent on the dark office */
+  --gold-fill: linear-gradient(135deg, #f1e2bd, #d6b67c 48%, #b38f52);
+  --gold-ink: #1d150c;
+  --error-glass: #f3b6a2;  /* the error on the dark glass */
   --sky: #84afc8;
   --error: #a3452e;
   --serif: "Cormorant Garamond", "Times New Roman", serif;
@@ -80,7 +83,7 @@ h1 em, h2 em { font-style: italic; color: var(--accent-ink); }
   min-height: 3.1rem;
   padding: 0.95rem 1.7rem;
   border: 1px solid var(--ink);
-  border-radius: 999px;
+  border-radius: 2px;
   background: var(--ink);
   color: var(--paper);
   font: 500 0.8rem/1 var(--sans);
@@ -88,7 +91,7 @@ h1 em, h2 em { font-style: italic; color: var(--accent-ink); }
   text-transform: uppercase;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 0.3s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.2s var(--ease);
+  transition: background-color 0.3s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.2s var(--ease), filter 0.3s var(--ease);
 }
 .btn:active { transform: scale(0.98); }
 @media (hover: hover) and (pointer: fine) {
@@ -96,6 +99,13 @@ h1 em, h2 em { font-style: italic; color: var(--accent-ink); }
 }
 .btn svg { width: 1.2rem; height: 1.2rem; flex: none; }
 .btn--sm { min-height: 2.5rem; padding: 0.65rem 1.15rem; font-size: 0.72rem; }
+/* The gold buttons: the Start on the hero and WhatsApp at the office. */
+.intro__copy .btn,
+.wa-cta .btn { border-color: transparent; background: var(--gold-fill); background-origin: border-box; color: var(--gold-ink); }
+@media (hover: hover) and (pointer: fine) {
+  .intro__copy .btn:hover,
+  .wa-cta .btn:hover { border-color: transparent; background: var(--gold-fill); background-origin: border-box; filter: brightness(1.08); }
+}
 .btn--ghost { background: transparent; color: var(--ink); }
 @media (hover: hover) and (pointer: fine) {
   .btn--ghost:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
@@ -264,7 +274,7 @@ html.js .rise__sticky {
 .intro__copy .kicker { color: rgb(251 248 243 / 0.92); }
 .intro__copy h1 {
   margin: 0 0 1.1rem;
-  font-size: clamp(2.7rem, 1.6rem + 5.2vw, 5.8rem);
+  font-size: clamp(2.7rem, min(1.6rem + 5.2vw, 12.5svh), 5.8rem);
   line-height: 0.98;
   letter-spacing: -0.012em;
   text-wrap: balance;
@@ -272,10 +282,6 @@ html.js .rise__sticky {
 .intro__copy h1 em { color: inherit; }
 .intro__copy .lead { max-width: 27rem; margin: 0 0 1.75rem; font-weight: 300; font-size: 1.1rem; }
 .intro__copy .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; }
-.intro__copy .btn { border-color: var(--on-photo); background: var(--on-photo); color: var(--ink); }
-@media (hover: hover) and (pointer: fine) {
-  .intro__copy .btn:hover { border-color: var(--paper-2); background: var(--paper-2); }
-}
 .rise__cue {
   display: inline-flex;
   align-items: center;
@@ -310,7 +316,7 @@ html.js .intro__copy { will-change: opacity, transform; }
   z-index: 5;
   padding: 0.7rem 1.1rem;
   border: 1px solid rgb(251 248 243 / 0.7);
-  border-radius: 999px;
+  border-radius: 2px;
   background: rgb(20 16 12 / 0.25);
   color: var(--on-photo);
   font: 500 0.72rem/1 var(--sans);
@@ -339,12 +345,12 @@ html:not(.js) .rise__skip { display: none; }
   width: min(100%, 40rem);
   margin-inline: auto;
 }
-/* The welcome sits on the picture, in ivory; the form is a sheet of paper on the desk. */
+/* The welcome sits on the picture, in ivory; the form is a pane of smoked glass with a gold edge. */
 .contact-intro { color: var(--on-photo); text-shadow: 0 0 1.4em rgb(16 12 9 / 0.55); }
 .contact-intro .kicker { color: var(--sand); }
 .contact-intro h2 {
   margin: 0 0 0.85rem;
-  font-size: clamp(2.5rem, 1.5rem + 3.4vw, 4.2rem);
+  font-size: clamp(2.5rem, min(1.5rem + 3.4vw, 9.5svh), 4.2rem);
   line-height: 1;
   letter-spacing: -0.01em;
   text-wrap: balance;
@@ -353,38 +359,76 @@ html:not(.js) .rise__skip { display: none; }
 .contact-intro h2:focus { outline: none; }
 .contact-intro > p:not(.kicker) { max-width: 30rem; margin: 0; color: rgb(251 248 243 / 0.88); font-weight: 300; font-size: 1.1rem; }
 .wa-cta { display: grid; justify-items: start; gap: 0.55rem; margin-top: 1.6rem; }
-.wa-cta .btn { border-color: var(--on-photo); background: var(--on-photo); color: var(--ink); text-shadow: none; }
-@media (hover: hover) and (pointer: fine) {
-  .wa-cta .btn:hover { border-color: var(--paper-2); background: var(--paper-2); }
-}
+.wa-cta .btn { text-shadow: none; }
 .wa-cta__note { margin: 0; color: rgb(251 248 243 / 0.75); font-size: 0.95rem; }
 
-/* A wide screen: the welcome on the left, the form on the right, the office all around. */
+/* The pane. --row, --field and --note set its height: a wide screen shrinks them with the window, so the whole form fits. */
+.form-card {
+  --row: 1.15rem;
+  --field: 2.75rem;
+  --note: 6.5rem;
+  position: relative;
+  container-type: inline-size;
+  padding: clamp(1.6rem, 5vw, 2.25rem);
+  border-radius: 3px;
+  background:
+    linear-gradient(150deg, rgb(255 238 205 / 0.1), rgb(255 238 205 / 0.02) 34%, transparent 58%),
+    rgb(20 15 10 / 0.72);
+  -webkit-backdrop-filter: blur(20px) saturate(135%);
+  backdrop-filter: blur(20px) saturate(135%);
+  box-shadow: 0 2rem 5rem rgb(0 0 0 / 0.55), inset 0 1px 0 rgb(255 240 210 / 0.14);
+  color: var(--on-photo);
+  color-scheme: dark;
+}
+/* Two gold lines: the bevelled edge, brighter where the light falls on it, and a fine rule inside, as on an etched pane. */
+.form-card::before,
+.form-card::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.form-card::before { inset: 0.5rem; border: 1px solid rgb(216 188 138 / 0.16); }
+.form-card::after {
+  inset: 0;
+  padding: 1px;
+  background: linear-gradient(140deg, rgb(241 226 189 / 0.9), rgb(216 188 138 / 0.3) 32%, rgb(216 188 138 / 0.14) 66%, rgb(241 226 189 / 0.6));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.form-card :focus-visible { outline-color: var(--sand); }
+
+.form-card__or {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 0 var(--row);
+  color: var(--sand);
+  font: 500 0.68rem/1.3 var(--sans);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.form-card__or::before,
+.form-card__or::after { content: ""; flex: 1; height: 1px; background: rgb(216 188 138 / 0.28); }
+
+/* A wide screen: the welcome on the left, the form on the right, the office all around, and everything on one screen, the
+   footer too. */
 @media (min-width: 1000px) {
-  .contact-section { padding-inline: clamp(2rem, 6vw, 6rem); }
+  .contact-section { padding: clamp(0.75rem, 3svh, 2.5rem) clamp(2rem, 6vw, 6rem) 3.25rem; }
   .contact-panel {
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     align-items: center;
     gap: clamp(2.5rem, 6vw, 6rem);
     width: min(100%, 76rem);
   }
-}
-
-.form-card {
-  container-type: inline-size;
-  padding: clamp(1.25rem, 3vw, 2.25rem);
-  border: 1px solid rgb(251 248 243 / 0.6);
-  border-radius: 22px;
-  background: rgb(251 248 243 / 0.96);
-  box-shadow: 0 1.75rem 4.5rem rgb(10 8 6 / 0.4);
-}
-
-.form-card__or {
-  margin: 0 0 1.25rem;
-  color: var(--ink-3);
-  font: 500 0.74rem/1.3 var(--sans);
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
+  .form-card {
+    --row: clamp(0.5rem, 1.7svh, 1.05rem);
+    --field: clamp(1.9rem, 4.6svh, 2.6rem);
+    --note: clamp(2.5rem, 8.5svh, 5rem);
+    padding: clamp(1.15rem, 3.4svh, 2.1rem) clamp(1.6rem, 2.8vw, 2.6rem);
+  }
 }
 
 /* ---------- The form ---------- */
@@ -392,97 +436,121 @@ html:not(.js) .rise__skip { display: none; }
 .request {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.1rem 1rem;
+  gap: var(--row) 1.6rem;
 }
 /* `display` above would override the hidden attribute: after sending, the form must really go. */
 .form-card [hidden] { display: none !important; }
 @container (max-width: 30rem) {
   .request { grid-template-columns: minmax(0, 1fr); }
 }
-.field { display: grid; align-content: start; gap: 0.45rem; min-width: 0; margin: 0; }
+.field { display: grid; align-content: start; gap: 0.1rem; min-width: 0; margin: 0; }
 .field--wide { grid-column: 1 / -1; }
 .field label,
 .chips legend {
-  color: var(--ink-2);
-  font: 500 0.74rem/1.3 var(--sans);
-  letter-spacing: 0.14em;
+  color: rgb(226 205 168 / 0.92);
+  font: 500 0.66rem/1.3 var(--sans);
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
-.field__opt { color: var(--ink-3); font-weight: 400; letter-spacing: 0.06em; text-transform: none; }
+.field__opt { color: rgb(251 248 243 / 0.68); font-weight: 400; letter-spacing: 0.06em; text-transform: none; }
+/* No boxes: a line under each field, which turns gold as you write on it. */
 .field input,
 .field select,
 .field textarea {
   width: 100%;
-  min-height: 3rem;
-  padding: 0.8rem 1rem;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: #fff;
-  color: var(--ink);
-  font: 400 1rem/1.4 var(--sans);
-  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  min-height: var(--field);
+  padding: 0.3rem 0;
+  border: 0;
+  border-bottom: 1px solid rgb(216 188 138 / 0.38);
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--on-photo);
+  font: 300 1rem/1.4 var(--sans);
+  transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
-.field textarea { min-height: 7rem; resize: vertical; }
+.field textarea { display: block; height: var(--note); resize: none; }
 .field select {
   appearance: none;
-  padding-right: 2.5rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%235a4f45' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  padding-right: 1.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%23dcc4a0' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 0.9rem center;
-  background-size: 0.95rem;
+  background-position: right 0.1rem center;
+  background-size: 0.9rem;
 }
-.field select:invalid { color: var(--ink-3); }
-.field ::placeholder { color: var(--ink-3); opacity: 0.8; }
+.field select:invalid { color: rgb(251 248 243 / 0.68); }
+.field option { background: #1b140e; color: var(--on-photo); }
+.field ::placeholder { color: rgb(251 248 243 / 0.66); opacity: 1; }
+.field :is(input, select, textarea):hover { border-bottom-color: rgb(216 188 138 / 0.65); }
 .field :is(input, select, textarea):focus-visible {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgb(156 127 92 / 0.18);
+  border-bottom-color: var(--sand);
+  box-shadow: 0 1px 0 var(--sand);
 }
-.field [aria-invalid="true"] { border-color: var(--error); }
-.field__error { margin: 0; color: var(--error); font-size: 0.9rem; }
+/* The browser's autofill would paint a pale box on the glass. */
+.field input:-webkit-autofill {
+  -webkit-text-fill-color: var(--on-photo);
+  caret-color: var(--on-photo);
+  transition: background-color 100000s, color 100000s;
+}
+.field [aria-invalid="true"] { border-bottom-color: var(--error-glass); }
+.field__error { margin: 0.2rem 0 0; color: var(--error-glass); font-size: 0.82rem; line-height: 1.3; }
 
 /* What do you need: checkboxes drawn as chips. The real checkbox stays on top of each chip, invisible, so a click,
    a tap and the keyboard all reach it. */
-.chips { display: grid; gap: 0.6rem; padding: 0; border: 0; }
-.chips legend { padding: 0; margin-bottom: 0.6rem; }
-.chips__list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chips { display: grid; gap: 0.2rem; padding: 0; border: 0; }
+.chips legend { padding: 0; margin-bottom: 0.45rem; }
+.chips__list { display: flex; flex-wrap: wrap; gap: 0.45rem; }
 .chip { position: relative; display: inline-flex; }
 /* More specific than `.field label`, which would set the chips in spaced capitals like the field labels. */
 .chips .chip { letter-spacing: normal; text-transform: none; }
-.chip input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.chip input { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; margin: 0; opacity: 0; cursor: pointer; }
 .chip span {
   display: inline-flex;
   align-items: center;
-  min-height: 2.7rem;
-  padding: 0.55rem 1.05rem;
-  border: 1px solid var(--line-2);
-  border-radius: 999px;
+  min-height: 2.6rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid rgb(216 188 138 / 0.32);
+  border-radius: 2px;
   background: transparent;
-  color: var(--ink-2);
-  font: 400 0.95rem/1 var(--sans);
+  color: rgb(251 248 243 / 0.86);
+  font: 400 0.86rem/1 var(--sans);
   transition: background-color 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
 }
-.chip input:checked + span { border-color: var(--ink); background: var(--ink); color: var(--paper); }
-.chip input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 3px; }
+.chip input:checked + span { border-color: transparent; background: var(--gold-fill); color: var(--gold-ink); }
+.chip input:focus-visible + span { outline: 2px solid var(--sand); outline-offset: 3px; }
 @media (hover: hover) and (pointer: fine) {
-  .chip:hover span { border-color: var(--ink); color: var(--ink); }
-  .chip:hover input:checked + span { color: var(--paper); }
+  .chip:hover span { border-color: var(--sand); color: var(--on-photo); }
+  .chip:hover input:checked + span { border-color: transparent; color: var(--gold-ink); }
 }
-.chips.is-invalid .chip span { border-color: var(--error); }
+.chips.is-invalid .chip span { border-color: var(--error-glass); }
+@media (min-width: 1000px) {
+  .chip span { min-height: clamp(1.9rem, 4.2svh, 2.3rem); }
+}
 
-.request__send { grid-column: 1 / -1; justify-self: start; margin-top: 0.4rem; }
+/* Gold is for the main way in: WhatsApp. Send is a gold line that fills under the pointer. */
+.request__send {
+  grid-column: 1;
+  justify-self: start;
+  border-color: var(--sand);
+  background: transparent;
+  color: var(--sand);
+}
+@media (hover: hover) and (pointer: fine) {
+  .request__send:hover { border-color: transparent; background: var(--gold-fill); color: var(--gold-ink); }
+}
 .request__send[disabled] { opacity: 0.6; cursor: progress; }
 .request__privacy,
-.request__status { grid-column: 1 / -1; margin: 0; }
-.request__privacy { color: var(--ink-3); font-size: 0.9rem; }
+.request__status { margin: 0; }
+.request__privacy { align-self: center; color: rgb(251 248 243 / 0.72); font-size: 0.78rem; line-height: 1.4; }
+.request__status { grid-column: 1 / -1; font-size: 0.9rem; line-height: 1.35; }
 .request__privacy a,
-.request__status a { color: var(--ink); text-decoration-color: var(--accent); text-underline-offset: 0.2em; }
+.request__status a { color: var(--on-photo); text-decoration-color: var(--sand); text-underline-offset: 0.2em; }
 .request__status:empty { display: none; }
-.request__status[data-tone="error"] { color: var(--error); }
+.request__status[data-tone="error"] { color: var(--error-glass); }
 .hp { display: none !important; }
 
 .request__done h3 { margin: 0 0 0.6rem; font-size: clamp(1.9rem, 1.4rem + 1.8vw, 2.6rem); line-height: 1.05; }
-.request__done p { margin: 0; color: var(--ink-2); }
+.request__done p { margin: 0; color: rgb(251 248 243 / 0.82); }
 .request__done:focus { outline: none; }
 
 
@@ -507,8 +575,9 @@ html:not(.js) .rise__skip { display: none; }
 @media (max-width: 640px) {
   .footer-links { flex-basis: 100%; margin-left: 0; }
 }
+/* A wide screen: the footer sits on the last line of the office's screen. */
 @media (min-width: 1000px) {
-  .site-footer { padding-inline: clamp(2rem, 6vw, 6rem); }
+  .site-footer { margin-top: -3rem; padding: 0.75rem clamp(2rem, 6vw, 6rem); font-size: 0.82rem; line-height: 1.4; }
 }
 
 /* ---------- Legal pages: plain paper, no scene ---------- */
