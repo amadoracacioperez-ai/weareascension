@@ -35,7 +35,7 @@
       // reduced motion (the tests set __noSplash). HOLD counts from when the logo is on screen, not from this script: on
       // a slow connection those are seconds apart, and the black was over before it could be seen. It opens once the CSS
       // is in: the line after the scene says so, because a script never runs before the stylesheets above it. A slow first
-      // frame holds it too, but never past LONGEST.
+      // frame holds it too, but never past LONGEST. Still not there by then: "data-late" keeps half a picture off the screen.
       var HOLD = 2600, LONGEST = 5000, FADE = 800;
       var cameBack = performance.getEntriesByType('navigation').some(function (n) { return n.type === 'back_forward'; });
       if (window.__noSplash || location.hash || cameBack || document.referrer.indexOf(location.origin) === 0 ||
@@ -54,9 +54,13 @@
         if (!held || !ready) return;
         var first = document.querySelector('.scene__poster');
         if (!first || first.complete) { reveal(); return; }
-        first.addEventListener('load', reveal);
-        first.addEventListener('error', reveal);
-        setTimeout(reveal, LONGEST - HOLD);
+        function arrived() { delete d.dataset.late; reveal(); }
+        first.addEventListener('load', arrived);
+        first.addEventListener('error', arrived);
+        setTimeout(function () {
+          if (!first.complete) d.dataset.late = '';
+          reveal();
+        }, LONGEST - HOLD);
       }
       d.dataset.splash = 'on';
       theme.content = '#000000';
@@ -69,7 +73,7 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="assets/fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <script src="assets/js/rise.js?v=f42ede77ed" defer fetchpriority="high"></script>
+  <script src="assets/js/rise.js?v=aa22fb0e84" defer fetchpriority="high"></script>
   <script src="assets/js/form.js?v=19759f7794" defer></script>
 </head>
 <body>
@@ -90,7 +94,7 @@
       <span class="splash__name">We Are Ascension</span>
     </div>
   </div>
-  <link rel="stylesheet" href="assets/css/site.css?v=b4699a8646">
+  <link rel="stylesheet" href="assets/css/site.css?v=b26ec71006">
 
   <div class="scene" aria-hidden="true">
     <picture>

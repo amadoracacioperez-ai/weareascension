@@ -31,6 +31,7 @@
   var SETS = { tall: '', wide: 'wide/' };  // the folder of each set inside the scene's
   var DEFAULT_SCENE = 'burj';
   var LOADING_AT_ONCE = 8;
+  var POSTER_WAIT = 8000;        // the frames wait for the poster, but not for ever
   var DECODING_AT_ONCE = 4;
   var AHEAD = 16, BEHIND = 6, MARGIN = 3; // frames kept decoded ahead (the way the picture moves) and behind; 3.7 MB each
   var FOLLOW = 0.2;              // share of the gap to the scroll that the picture closes in each 60 Hz frame
@@ -314,8 +315,7 @@
     var a = Math.floor(f);
     var A = below(a);
     var B = above(Math.min(count - 1, a + 1));
-    if (A < 0 && B < 0) return; // nothing ready yet: the poster stays
-    if (A < 0) A = B;
+    if (A < 0) return; // the first frame is not ready: the poster, which is that frame, stays. Never the office on the hero
     if (B < 0) B = A;
     var t = B === A ? 0 : Math.round(Math.min(1, Math.max(0, (f - A) / (B - A))) * BLEND_STEPS) / BLEND_STEPS;
     if (t >= 1) { A = B; t = 0; }
@@ -614,7 +614,22 @@
   window.addEventListener('load', measure);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
 
+  // The poster goes first and alone. Sharing the line with eight frames it took over 5 s at 200 KB/s, frame 0 queued
+  // behind it (the same address) and the last frame won: the hero opened on the office. Frame 0 then comes from the cache.
+  function afterPoster(go) {
+    if (!poster || poster.complete) { go(); return; }
+    var started = false;
+    function once() {
+      if (started) return;
+      started = true;
+      go();
+    }
+    poster.addEventListener('load', once);
+    poster.addEventListener('error', once);
+    setTimeout(once, POSTER_WAIT);
+  }
+
   measure();
-  pump();
+  afterPoster(pump);
   window.__riseReady = true; // tells the inline fail-open check in <head> that this script ran
 }());

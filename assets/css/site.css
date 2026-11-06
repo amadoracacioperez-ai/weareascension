@@ -153,6 +153,9 @@ html[data-splash="out"] .top { transition-delay: 0.6s; }
   max-width: none;
   object-fit: cover;
 }
+/* The page opened before the first frame came (very slow connections): plain dark, then the whole picture fades in. */
+.scene__poster { transition: opacity 0.8s var(--ease); }
+html[data-late] .scene__poster { opacity: 0; transition: none; }
 .scene__canvas { opacity: 0; transition: opacity 0.4s var(--ease); }
 .scene__canvas[data-state="ready"] { opacity: 1; }
 /* Shade for the text on the picture: the header at the top and the hero at the bottom. In the office the left side
