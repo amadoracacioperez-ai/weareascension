@@ -34,7 +34,8 @@
       // Only for someone arriving from outside: not at #contact, not coming back from the legal pages, and not with
       // reduced motion (the tests set __noSplash). HOLD counts from when the logo is on screen, not from this script: on
       // a slow connection those are seconds apart, and the black was over before it could be seen. It opens once the CSS
-      // and the scripts are in. A slow first frame holds it too, but never past LONGEST.
+      // is in: the line after the scene says so, because a script never runs before the stylesheets above it. A slow first
+      // frame holds it too, but never past LONGEST.
       var HOLD = 2600, LONGEST = 5000, FADE = 800;
       var cameBack = performance.getEntriesByType('navigation').some(function (n) { return n.type === 'back_forward'; });
       if (window.__noSplash || location.hash || cameBack || document.referrer.indexOf(location.origin) === 0 ||
@@ -59,7 +60,7 @@
       }
       d.dataset.splash = 'on';
       theme.content = '#000000';
-      document.addEventListener('DOMContentLoaded', function () { ready = true; tryToOpen(); });
+      window.__styled = function () { ready = true; tryToOpen(); };
       requestAnimationFrame(function () {
         setTimeout(function () { held = true; tryToOpen(); }, HOLD);
       });
@@ -68,7 +69,7 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="assets/fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <script src="assets/js/rise.js?v=f42ede77ed" defer></script>
+  <script src="assets/js/rise.js?v=f42ede77ed" defer fetchpriority="high"></script>
   <script src="assets/js/form.js?v=19759f7794" defer></script>
 </head>
 <body>
@@ -94,11 +95,12 @@
   <div class="scene" aria-hidden="true">
     <picture>
       <source class="scene__poster-wide" media="(min-aspect-ratio: 1/1)" srcset="assets/scenes/burj/wide/001.webp" width="1920" height="1080">
-      <img class="scene__poster" src="assets/scenes/burj/001.webp" width="720" height="1280" alt="" fetchpriority="high">
+      <img class="scene__poster" src="assets/scenes/burj/001.webp" width="720" height="1280" alt="">
     </picture>
     <canvas class="scene__canvas" width="720" height="1280"></canvas>
     <div class="scene__shade"></div>
   </div>
+  <script>if (window.__styled) window.__styled();</script>
 
   <a class="skip" href="#contact">Skip to the contact form</a>
 
