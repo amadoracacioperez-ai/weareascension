@@ -10,6 +10,18 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="We Are Ascension — Websites that make your brand rise">
   <meta property="og:description" content="Cinematic, fast websites for ambitious businesses worldwide. Start your project.">
+  <style>
+    @font-face { font-family: "Cormorant Garamond"; font-weight: 500; font-style: normal; font-display: swap; src: url("assets/fonts/cormorant-garamond-latin-500-normal.woff2") format("woff2"); }
+    .splash { display: none; }
+    html[data-splash] { background: #000; }
+    html[data-splash="on"] { overflow: hidden; }
+    html[data-splash] .splash { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: #000; color: #fbf8f3; touch-action: none; }
+    html[data-splash="out"] .splash { opacity: 0; pointer-events: none; transition: opacity 0.8s ease; }
+    .splash__logo { display: grid; justify-items: center; gap: 1.1rem; animation: splash-in 1.3s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both; }
+    .splash__mark { width: 3.5rem; height: 3.5rem; }
+    .splash__name { font: 500 1.4rem/1 "Cormorant Garamond", "Times New Roman", serif; letter-spacing: 0.04em; -webkit-font-smoothing: antialiased; }
+    @keyframes splash-in { from { opacity: 0; filter: blur(14px); } to { opacity: 1; filter: blur(0); } }
+  </style>
   <script>
     // Before the first paint: "js" turns the hero into the start of a tall climb (rise.js). It fails open: if rise.js
     // never runs, the load handler drops it, and the page is a one-screen hero with the form right below.
@@ -20,14 +32,16 @@
 
       // The way in: the logo on black for a few seconds, as on wearebrand.io, while the first frames arrive behind it.
       // Only for someone arriving from outside: not at #contact, not coming back from the legal pages, and not with
-      // reduced motion (the tests set __noSplash). A slow first frame holds it, but never past LONGEST.
+      // reduced motion (the tests set __noSplash). HOLD counts from when the logo is on screen, not from this script: on
+      // a slow connection those are seconds apart, and the black was over before it could be seen. It opens once the CSS
+      // and the scripts are in. A slow first frame holds it too, but never past LONGEST.
       var HOLD = 2600, LONGEST = 5000, FADE = 800;
       var cameBack = performance.getEntriesByType('navigation').some(function (n) { return n.type === 'back_forward'; });
       if (window.__noSplash || location.hash || cameBack || document.referrer.indexOf(location.origin) === 0 ||
           matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       var theme = document.querySelector('meta[name="theme-color"]');
       var paper = theme.content;
-      var open = false;
+      var open = false, held = false, ready = false;
       function reveal() {
         if (open) return;
         open = true;
@@ -35,21 +49,25 @@
         theme.content = paper;
         setTimeout(function () { delete d.dataset.splash; }, FADE);
       }
-      d.dataset.splash = 'on';
-      theme.content = '#000000';
-      setTimeout(function () {
+      function tryToOpen() {
+        if (!held || !ready) return;
         var first = document.querySelector('.scene__poster');
         if (!first || first.complete) { reveal(); return; }
         first.addEventListener('load', reveal);
         first.addEventListener('error', reveal);
         setTimeout(reveal, LONGEST - HOLD);
-      }, HOLD);
+      }
+      d.dataset.splash = 'on';
+      theme.content = '#000000';
+      document.addEventListener('DOMContentLoaded', function () { ready = true; tryToOpen(); });
+      requestAnimationFrame(function () {
+        setTimeout(function () { held = true; tryToOpen(); }, HOLD);
+      });
     }());
   </script>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="assets/fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/site.css?v=c6c8ecdc96">
   <script src="assets/js/rise.js?v=f42ede77ed" defer></script>
   <script src="assets/js/form.js?v=19759f7794" defer></script>
 </head>
@@ -71,6 +89,7 @@
       <span class="splash__name">We Are Ascension</span>
     </div>
   </div>
+  <link rel="stylesheet" href="assets/css/site.css?v=b4699a8646">
 
   <div class="scene" aria-hidden="true">
     <picture>

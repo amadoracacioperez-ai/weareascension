@@ -118,32 +118,10 @@ h1 em, h2 em { font-style: italic; color: var(--accent-ink); }
 }
 .link:hover { text-decoration-color: var(--accent); }
 
-/* ---------- The way in: the logo on black, then the page ---------- */
+/* ---------- The way in: the page arrives as the black lifts ---------- */
 
-/* The script in <head> sets data-splash, on someone arriving from outside: "on", then "out" for the fade. The page behind
-   stays shut until the fade starts, and any scrollbar it brings back appears while the black still covers everything. */
-.splash { display: none; }
-html[data-splash] { background: #000; }
-html[data-splash="on"] { overflow: hidden; }
-html[data-splash] .splash {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: grid;
-  place-items: center;
-  background: #000;
-  color: var(--on-photo);
-  touch-action: none;
-}
-html[data-splash="out"] .splash { opacity: 0; pointer-events: none; transition: opacity 0.8s ease; }
-.splash__logo { display: grid; justify-items: center; gap: 1.1rem; animation: splash-in 1.3s var(--ease) 0.15s both; }
-.splash__mark { width: 3.5rem; height: 3.5rem; }
-.splash__name { font: 500 1.4rem/1 var(--serif); letter-spacing: 0.04em; }
-@keyframes splash-in {
-  from { opacity: 0; filter: blur(14px); }
-  to { opacity: 1; filter: blur(0); }
-}
-/* The page arrives as the black lifts: the hero line by line, then the header. */
+/* The logo and the black have their styles in the <head> of index.html, so they wait for nothing. Here, the hero comes in
+   line by line, then the header. */
 html.js .top,
 html.js .intro__copy > * { transition: opacity 1s var(--ease), transform 1s var(--ease); }
 html[data-splash="on"] .top,
